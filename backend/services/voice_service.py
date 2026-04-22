@@ -16,7 +16,7 @@ class VoiceService:
 
         # 1. Extract Intent via Groq
         nlp_result = self.ai.process_command(audio_text, self.user.name, productivity_context=stats)
-        print(f"🤖 Debug: NLP Result: {nlp_result}")
+        print(f"🤖 [VoiceService] Groq Raw Result: {nlp_result}")
         intent = nlp_result.get('intent')
         data = nlp_result.get('task_data', {})
         response_text = nlp_result.get('response_text', '')
@@ -86,6 +86,7 @@ class VoiceService:
 
     def parse_command(self, audio_text: str):
         nlp_result = self.ai.process_command(audio_text, self.user.name)
+        print(f"🤖 [VoiceService] Parse Raw Result: {nlp_result}")
         intent = nlp_result.get('intent')
         data = nlp_result.get('task_data', {})
         voice_feedback = nlp_result.get('response_text', '')

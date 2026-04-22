@@ -32,7 +32,7 @@ print(f"🔒 Allowed CORS Origins: {origins}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://taskify-.*\.vercel\.app", # Allow all Vercel preview links
+    allow_origin_regex=r"https://(taskify|rn-taskify).*?\.vercel\.app", # Matches taskify.vercel.app, rn-taskify.vercel.app, and their preview links
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

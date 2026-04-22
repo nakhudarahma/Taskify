@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Union
 from jose import jwt
 from passlib.context import CryptContext
@@ -13,7 +13,8 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 def create_access_token(subject: Union[str, Any], user_name: str = None) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    # Use timezone-aware UTC for creation
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"exp": expire, "sub": str(subject)}
     if user_name:
         to_encode["name"] = user_name
@@ -22,7 +23,7 @@ def create_access_token(subject: Union[str, Any], user_name: str = None) -> str:
 
 def decode_access_token(token: str) -> dict:
     try:
-        # Step 1: Decode without automatic expiration check to avoid library-specific argument bugs
+        # Step 1: Decode without automatic expiration check
         decoded_token = jwt.decode(
             token, 
             settings.SECRET_KEY, 
@@ -33,10 +34,14 @@ def decode_access_token(token: str) -> dict:
         # Step 2: Manual Expiration Check with 5-minute leeway
         exp = decoded_token.get("exp")
         if exp:
-            # Add 300 seconds (5 mins) leeway to the expiration timestamp
-            if datetime.utcnow().timestamp() > (exp + 300):
-                print(f"❌ JWT Decode Error: Token has expired (Current: {datetime.utcnow().timestamp()}, Exp: {exp})")
+            current_time = datetime.now(timezone.utc).timestamp()
+            # exp is usually an int timestamp
+            if current_time > (exp + 300):
+                print(f"❌ JWT Decode Error: Token has expired (Current: {int(current_time)}, Exp: {exp})")
                 return None
+            else:
+                # DEBUG: confirm success
+                print(f"✅ JWT Decode Success: sub={decoded_token.get('sub')} exp={exp} current={int(current_time)}")
                 
         return decoded_token
     except jwt.JWTError as e:

@@ -246,7 +246,8 @@ const VoiceInput = ({ onTaskCreated }: VoiceInputProps) => {
         });
         return; // STOP HERE - do not fall back to "Create Task" if AI call errors
       }
-      console.log('🤖 Backend Parse Result:', data);
+      console.log('🤖 [VoiceInput] Final Data Intent:', data.intent);
+      console.log('🤖 [VoiceInput] Backend Parse Result:', data);
 
       // 2. Try Local Parsing (Regex/Heuristic)
       const localExtracted = extractDateAndTime(text);
@@ -271,7 +272,15 @@ const VoiceInput = ({ onTaskCreated }: VoiceInputProps) => {
 
       setParsedTask(updatedTask);
 
-      // 4. Handle Specific Intents (Chat/Execute)
+      // 4. Handle Specific Intents (Invalid/Chat/Execute)
+      if (data.intent === 'invalid') {
+        const feedback = data.voice_feedback || "I encountered an error understanding that.";
+        setErrorMessage(feedback);
+        setStatus('error');
+        speakError();
+        return;
+      }
+
       if (data.intent === 'chat') {
         const feedback = data.voice_feedback || "I'm not sure what you mean, but I'm listening.";
         speakCustom(feedback);
@@ -774,84 +783,113 @@ const VoiceInput = ({ onTaskCreated }: VoiceInputProps) => {
           )}
         </AnimatePresence>
 
-        {/* Final: Parsed Task Result */}
+        {/* Final: Result View (Task or Chat) */}
         <AnimatePresence>
           {parsedTask && status === 'done' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-6 glass-card p-6 text-left border-2 border-primary/20"
+              className="mt-6 w-full"
             >
-              <div className="space-y-4 mb-4">
-                <div className="space-y-2">
-                  <Label className="text-primary font-medium">Task Name</Label>
-                  <Input
-                    value={parsedTask.title}
-                    onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, title: e.target.value } : null)}
-                    className="bg-background border-primary/50 text-lg font-semibold"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-accent" />
-                      Date
-                    </Label>
-                    <Input
-                      type="date"
-                      value={parsedTask.date || ""}
-                      onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, date: e.target.value } : null)}
-                      className="bg-secondary/30"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-primary" />
-                      Time
-                    </Label>
-                    <Input
-                      type="time"
-                      value={parsedTask.time || ""}
-                      onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, time: e.target.value } : null)}
-                      className="bg-secondary/30"
-                    />
+              {parsedTask.intent === 'chat' ? (
+                /* Chat Response Bubble */
+                <div className="glass-card p-6 border-2 border-primary/30 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <Mic className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="space-y-4 flex-1">
+                      <p className="text-xl font-medium text-foreground leading-relaxed italic">
+                        "{parsedTask.voice_feedback || transcription}"
+                      </p>
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={handleReset}
+                          variant="ghost"
+                          className="text-primary hover:bg-primary/10 gap-2"
+                        >
+                          <X className="w-4 h-4" /> Close
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                /* Task Confirmation Form */
+                <div className="glass-card p-6 text-left border-2 border-primary/20">
+                  <div className="space-y-4 mb-4">
+                    <div className="space-y-2">
+                      <Label className="text-primary font-medium">Task Name</Label>
+                      <Input
+                        value={parsedTask.title}
+                        onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, title: e.target.value } : null)}
+                        className="bg-background border-primary/50 text-lg font-semibold"
+                        autoFocus
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2 text-sm">
-                    <Bell className="w-4 h-4 text-warning" />
-                    Reminder
-                  </Label>
-                  <Select
-                    value={String(parsedTask.reminder_minutes || "")}
-                    onValueChange={(val) => setParsedTask((prev: any) => prev ? { ...prev, reminder_minutes: parseInt(val) } : null)}
-                  >
-                    <SelectTrigger className="bg-secondary/30">
-                      <SelectValue placeholder="No reminder" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REMINDER_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm">
+                          <Calendar className="w-4 h-4 text-accent" />
+                          Date
+                        </Label>
+                        <Input
+                          type="date"
+                          value={parsedTask.date || ""}
+                          onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, date: e.target.value } : null)}
+                          className="bg-secondary/30"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm">
+                          <Clock className="w-4 h-4 text-primary" />
+                          Time
+                        </Label>
+                        <Input
+                          type="time"
+                          value={parsedTask.time || ""}
+                          onChange={(e) => setParsedTask((prev: any) => prev ? { ...prev, time: e.target.value } : null)}
+                          className="bg-secondary/30"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2 text-sm">
+                        <Bell className="w-4 h-4 text-warning" />
+                        Reminder
+                      </Label>
+                      <Select
+                        value={String(parsedTask.reminder_minutes || "")}
+                        onValueChange={(val) => setParsedTask((prev: any) => prev ? { ...prev, reminder_minutes: parseInt(val) } : null)}
+                      >
+                        <SelectTrigger className="bg-secondary/30">
+                          <SelectValue placeholder="No reminder" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {REMINDER_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <Button onClick={handleSaveTask} disabled={isSaving} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/85 gap-2 btn-cheerful">
+                      <Check className="w-4 h-4" /> Confirm & Save
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={handleReset}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <Button onClick={handleSaveTask} disabled={isSaving} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/85 gap-2 btn-cheerful">
-                  <Check className="w-4 h-4" /> Confirm & Save
-                </Button>
-                <Button variant="outline" size="icon" onClick={handleReset}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
