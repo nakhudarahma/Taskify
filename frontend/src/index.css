@@ -1,0 +1,342 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Taskify Design System - Calm Authority Palette */
+
+@layer base {
+  :root {
+    /* Core backgrounds - #F6F7FB light neutral */
+    --background: 225 39% 97%;
+    --foreground: 221 30% 18%;
+
+    /* Cards & surfaces - #FFFFFF */
+    --card: 0 0% 100%;
+    --card-foreground: 221 30% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 30% 18%;
+
+    /* Primary - #3A5BA0 steel authority blue */
+    --primary: 221 47% 43%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light neutral */
+    --secondary: 225 25% 95%;
+    --secondary-foreground: 221 30% 18%;
+
+    /* Muted surfaces */
+    --muted: 220 20% 93%;
+    --muted-foreground: 220 12% 40%;
+
+    /* Accent - Slightly lighter steel blue */
+    --accent: 221 35% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status colors */
+    /* Muted Red #C1121F - consequences only */
+    --destructive: 355 83% 41%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Muted Green #4C7C59 - quiet success only */
+    --success: 136 24% 39%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 70% 45%;
+    --warning-foreground: 221 30% 15%;
+
+    /* Mint - mapped to muted teal */
+    --mint: 175 25% 42%;
+    --mint-foreground: 0 0% 100%;
+
+    /* Sunny - mapped to a muted slate accent */
+    --sunny: 221 30% 58%;
+    --sunny-foreground: 221 30% 20%;
+
+    /* Borders - #E5E7EB subtle gray */
+    --border: 220 13% 91%;
+    --input: 220 13% 86%;
+    --ring: 221 47% 43%;
+
+    --radius: 0.5rem;
+
+    /* No gradients — flat solid colors */
+    --gradient-primary: hsl(221 47% 43%);
+    --gradient-accent: hsl(225 39% 97%);
+    --gradient-hero: hsl(225 39% 97%);
+    --gradient-glow: transparent;
+    --gradient-card: hsl(0 0% 100%);
+    
+    /* Voice-specific colors */
+    --voice-active: 221 47% 43%;
+    --voice-pulse: 221 35% 55%;
+    --voice-ring: 221 40% 50%;
+
+    /* Shadows - Minimal, neutral */
+    --shadow-sm: 0 1px 3px hsl(220 15% 50% / 0.06);
+    --shadow-md: 0 2px 8px hsl(220 15% 50% / 0.08);
+    --shadow-lg: 0 4px 16px hsl(220 15% 50% / 0.1);
+    --shadow-glow: 0 0 12px hsl(221 47% 43% / 0.1);
+    --shadow-glow-lg: 0 0 20px hsl(221 47% 43% / 0.12);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 221 30% 25%;
+    --sidebar-primary: 221 47% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 225 39% 97%;
+    --sidebar-accent-foreground: 221 30% 25%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 221 47% 43%;
+  }
+
+  .dark {
+    --background: 221 25% 10%;
+    --foreground: 220 20% 90%;
+    --card: 221 22% 14%;
+    --card-foreground: 220 20% 90%;
+    --popover: 221 22% 14%;
+    --popover-foreground: 220 20% 90%;
+    --primary: 221 45% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 221 20% 18%;
+    --secondary-foreground: 220 20% 90%;
+    --muted: 221 18% 16%;
+    --muted-foreground: 220 15% 60%;
+    --accent: 221 35% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 355 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 136 20% 35%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 60% 45%;
+    --warning-foreground: 0 0% 100%;
+    --border: 221 18% 22%;
+    --input: 221 18% 26%;
+    --ring: 221 45% 50%;
+    --sidebar-background: 221 22% 12%;
+    --sidebar-foreground: 220 20% 70%;
+    --sidebar-primary: 221 45% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 221 18% 16%;
+    --sidebar-accent-foreground: 220 20% 90%;
+    --sidebar-border: 221 18% 18%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  p, span, label {
+    font-weight: 450;
+  }
+
+  /* Custom scrollbar - Minimal */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/15 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/30;
+  }
+}
+
+@layer components {
+  /* Clean flat card - no glassmorphism */
+  .glass-card {
+    @apply bg-card border border-border rounded-lg transition-all duration-200;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .glass-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: hsl(221 47% 43% / 0.2);
+  }
+
+  /* Gradient text — now solid primary */
+  .gradient-text {
+    @apply text-primary;
+  }
+
+  /* Glow effect — subtle */
+  .glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-lg {
+    box-shadow: var(--shadow-glow-lg);
+  }
+
+  /* Voice button animations */
+  .voice-button {
+    @apply relative transition-all duration-200;
+  }
+
+  .voice-button::before {
+    content: '';
+    @apply absolute inset-0 rounded-full opacity-0 transition-opacity duration-200;
+    background: hsl(221 47% 43%);
+    filter: blur(16px);
+  }
+
+  .voice-button:hover::before,
+  .voice-button.active::before {
+    @apply opacity-20;
+  }
+
+  /* Pulse animation for recording */
+  .pulse-ring {
+    @apply absolute inset-0 rounded-full;
+    animation: pulse-ring 2s ease-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+
+  /* Fade in up animation */
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Stagger children animation */
+  .stagger-children > * {
+    @apply opacity-0;
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+
+  /* Task card hover effect */
+  .task-card {
+    @apply transition-all duration-200;
+  }
+
+  .task-card:hover {
+    @apply border-primary/25;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Sidebar item active state */
+  .sidebar-item {
+    @apply transition-all duration-200;
+  }
+
+  .sidebar-item.active {
+    @apply bg-primary/10 text-primary border-l-2 border-primary;
+  }
+
+  /* Success animation */
+  .success-bounce {
+    animation: success-bounce 0.5s ease-out;
+  }
+
+  @keyframes success-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  /* Button hover — flat, no glow */
+  .btn-cheerful {
+    @apply transition-all duration-150;
+  }
+
+  .btn-cheerful:hover {
+    opacity: 0.9;
+  }
+
+  .btn-cheerful:active {
+    opacity: 0.85;
+  }
+
+  /* Quick action card */
+  .quick-card {
+    @apply bg-card border border-border p-4 cursor-pointer rounded-lg transition-all duration-200;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .quick-card:hover {
+    @apply border-primary/25 bg-primary/5;
+  }
+}
+
+@layer utilities {
+  /* Hero background — flat neutral */
+  .hero-pattern {
+    background: hsl(225 39% 97%);
+  }
+
+  /* Grid pattern */
+  .grid-pattern {
+    background-image: 
+      linear-gradient(hsl(var(--border) / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.15) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Flat background */
+  .bg-cheerful {
+    background: hsl(225 39% 97%);
+  }
+}
